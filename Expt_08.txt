@@ -1,0 +1,129 @@
+------------> MainActivity.java
+
+package com.example.expt_08;
+
+import android.media.MediaPlayer;
+import android.os.Bundle;
+import android.view.View;
+
+import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+
+public class MainActivity extends AppCompatActivity {
+
+    MediaPlayer mediaPlayer;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_main);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+
+        mediaPlayer=null;
+    }
+
+
+    public void play_music(View view) {
+        if(mediaPlayer==null)
+            mediaPlayer = MediaPlayer.create(this,R.raw.tuhai);
+
+        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                stopmusicll();
+            }
+        });
+        mediaPlayer.start();
+    }
+
+
+
+    public void pause_music(View view) {
+        if(mediaPlayer!=null)
+            mediaPlayer.pause();
+    }
+
+    public void stop_music(View view) {
+        if(mediaPlayer!=null)
+        {
+            mediaPlayer.stop();
+            stopmusicll();
+        }
+    }
+
+    private void stopmusicll() {
+        mediaPlayer.release();
+        mediaPlayer=null;
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        stopmusicll();
+    }
+}
+
+
+--------------> activity_main.xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <TextView
+        android:id="@+id/media_player"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Media_Player"
+        android:gravity="center"
+        android:layout_margin="20dp"
+        android:textSize="20dp"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/play"
+        android:text="PLAY"
+        android:gravity="center"
+        android:layout_margin="20dp"
+        android:textSize="20dp"
+        android:layout_below="@+id/media_player"
+        android:onClick="play_music"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/pause"
+        android:text="PAUSE"
+        android:gravity="center"
+        android:layout_margin="20dp"
+        android:textSize="20dp"
+        android:layout_below="@+id/play"
+        android:onClick="pause_music"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/stop"
+        android:text="STOP"
+        android:gravity="center"
+        android:layout_margin="20dp"
+        android:textSize="20dp"
+        android:layout_below="@+id/pause"
+        android:onClick="stop_music"/>
+
+
+</RelativeLayout>

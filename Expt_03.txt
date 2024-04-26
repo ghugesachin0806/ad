@@ -1,0 +1,412 @@
+--------> MainActivity.java
+
+package com.example.expt_03;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+
+import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+
+public class MainActivity extends AppCompatActivity {
+
+    EditText username, password , confirm_password ;
+    Button SignUp, Signin;
+
+    DBHelper db;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_main);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+
+        username = (EditText) findViewById(R.id.username);
+        password = (EditText) findViewById(R.id.password);
+        confirm_password = (EditText) findViewById(R.id.confirmpassword);
+
+        SignUp = (Button) findViewById(R.id.signup);
+        Signin = (Button) findViewById(R.id.signin);
+
+        db = new DBHelper(this);
+
+        SignUp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String user = username.getText().toString();
+                String pass = password.getText().toString();
+                String repass = confirm_password.getText().toString();
+
+                if(pass.equals("")|| user.equals("")||repass.equals(""))
+                {
+                    Toast.makeText(MainActivity.this, "Please Enter All", Toast.LENGTH_SHORT).show();
+                }
+                else
+                {
+                    if(pass.equals(repass))
+                    {
+                        Boolean checkuser = db.checkUsername(user);
+                        if(checkuser==false)
+                        {
+                            Boolean insert = db.insertData(user,pass);
+                            if(insert==true) {
+                                Intent intent = new Intent(getApplicationContext(), Home_Activity.class);
+                                startActivity(intent);
+                            }
+                            else
+                                Toast.makeText(MainActivity.this, "False !", Toast.LENGTH_SHORT).show();
+                        }
+                        else
+                        {
+                            Toast.makeText(MainActivity.this, "User Already Exist", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                    else
+                    {
+                        Toast.makeText(MainActivity.this, "Password doesn't match", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        });
+
+        Signin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent intent = new Intent(getApplicationContext(),Login_Activity.class);
+                startActivity(intent);
+
+            }
+        });
+    }
+}
+
+--------> activity_main.xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="10dp"
+    tools:context=".MainActivity">
+<!--Registration-->
+    <TextView
+        android:id="@+id/registration_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="50dp"
+        android:gravity="center"
+        android:textColor="#7922c6"
+        android:text="Registration">
+
+    </TextView>
+<!--Username-->
+<EditText
+    android:id="@+id/username"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_below="@+id/registration_text"
+    android:hint="Username"
+    android:layout_margin="20dp">
+</EditText>
+<!--    Password-->
+    <EditText
+        android:id="@+id/password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Password"
+        android:layout_below="@+id/username"
+        android:inputType="textPassword"
+        android:layout_margin="20dp">
+    </EditText>
+<!--    Confirm Password-->
+    <EditText
+        android:id="@+id/confirmpassword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Confirm Password"
+        android:layout_below="@+id/password"
+        android:inputType="textPassword"
+        android:layout_margin="20dp">
+    </EditText>
+
+<!--    Signup-->
+    <Button
+        android:id="@+id/signup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="SignUp"
+        android:layout_margin="20dp"
+        android:layout_below="@+id/confirmpassword"
+        android:background="#9966cc"
+        android:textColor="#ffffff"
+        >
+    </Button>
+
+<!--    Signin-->
+    <Button
+        android:id="@+id/signin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Signin"
+        android:layout_margin="20dp"
+        android:layout_below="@+id/signup"
+        android:background="#9966cc"
+        android:textColor="#ffffff"
+        >
+    </Button>
+
+
+</RelativeLayout>
+
+--------> Login_Activity.java
+
+package com.example.expt_03;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+
+import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+
+public class Login_Activity extends AppCompatActivity {
+
+    EditText username,password;
+    Button login;
+    DBHelper db;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_login);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+        username = (EditText) findViewById(R.id.login_username);
+        password = (EditText) findViewById(R.id.login_password);
+
+        login = (Button) findViewById(R.id.login_button);
+
+        db = new DBHelper(this);
+
+        login.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Boolean bt  = db.checkUsernamePassword(username.getText().toString(),password.getText().toString());
+                if(bt)
+                {
+                    Intent intent = new Intent(getApplicationContext(), Home_Activity.class);
+                    startActivity(intent);
+                }
+                else
+                {
+                    Toast.makeText(Login_Activity.this, "Login_Failed", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+}
+
+--------> activity_login.xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Login_Activity">
+
+    <!--Login-->
+    <TextView
+        android:id="@+id/login_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="50dp"
+        android:gravity="center"
+        android:textColor="#7922c6"
+        android:text="Login">
+
+    </TextView>
+    <!--Username-->
+    <EditText
+        android:id="@+id/login_username"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/login_text"
+        android:hint="Username"
+        android:layout_margin="20dp">
+    </EditText>
+    <!--    Password-->
+    <EditText
+        android:id="@+id/login_password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Password"
+        android:layout_below="@+id/login_username"
+        android:inputType="textPassword"
+        android:layout_margin="20dp">
+    </EditText>
+
+    <!--    Login-->
+    <Button
+        android:id="@+id/login_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Login"
+        android:layout_margin="20dp"
+        android:layout_below="@+id/login_password"
+        android:background="#9966cc"
+        android:textColor="#ffffff"
+        >
+    </Button>
+
+</RelativeLayout>
+
+--------> Home_Activity.java
+
+package com.example.expt_03;
+
+import android.os.Bundle;
+
+import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+
+public class Home_Activity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_home);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+    }
+}
+
+--------> activity_home.xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#7922c6"
+    tools:context=".Home_Activity">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Welcome Home"
+        android:gravity="center"
+        android:textColor="#ffffff"
+        android:textSize="30dp"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true">
+
+    </TextView>
+
+</RelativeLayout>
+
+--------> DBHelper.java
+
+package com.example.expt_03;
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+
+import androidx.annotation.Nullable;
+
+public class DBHelper extends SQLiteOpenHelper {
+    public static final String DBNAME= "Login.db";
+
+    public DBHelper(Context context) {
+        super(context, "Login.db", null, 1);
+    }
+
+
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        db.execSQL("create Table users(username TEXT primary key,password TEXT)");
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("drop Table if exists users");
+
+    }
+
+    public Boolean insertData(String username, String password)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("username",username);
+        contentValues.put("password",password);
+        long result = db.insert("users",null,contentValues);
+
+        if(result==-1)
+            return false;
+        else
+            return true;
+    }
+
+    public Boolean checkUsername(String username)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery("select * from users where username=?",new String[]{username});
+
+        if(cursor.getCount()>0)
+            return true;
+        else
+            return false;
+    }
+    public Boolean checkUsernamePassword(String username, String password)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery("select * from users where username=? and password=?",new String[]{username,password});
+
+        if(cursor.getCount()>0)
+            return true;
+        else
+            return false;
+    }
+
+}

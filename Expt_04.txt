@@ -1,0 +1,344 @@
+-----------------> MainActivity.java
+
+package com.example.expt_04;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.RadioGroup;
+import android.widget.Spinner;
+
+import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+
+public class MainActivity extends AppCompatActivity {
+
+    EditText name,password;
+    Spinner spinner;
+    RadioGroup rdgrp;
+    CheckBox be,me,phd;
+
+    Button submit;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_main);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+
+        name = (EditText) findViewById(R.id.name);
+        password = (EditText) findViewById(R.id.password);
+
+        spinner = (Spinner) findViewById(R.id.spinner);
+
+        rdgrp = (RadioGroup) findViewById(R.id.gender);
+
+        be = (CheckBox) findViewById(R.id.be);
+        me = (CheckBox) findViewById(R.id.me);
+        phd = (CheckBox) findViewById(R.id.phd);
+
+        submit = (Button) findViewById(R.id.submit);
+
+        submit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), Home.class);
+                intent.putExtra("name",name.getText().toString());
+                intent.putExtra("password",password.getText().toString());
+                intent.putExtra("spinner",spinner.getSelectedItem().toString());
+                intent.putExtra("rdgrp",rdgrp.getCheckedRadioButtonId());
+                intent.putExtra("checked","PHD");
+
+                if(be.isChecked())
+                    intent.putExtra("checked","BE");
+                startActivity(intent);
+            }
+        });
+    }
+}
+
+-----------------> activity_main.xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="20dp"
+    tools:context=".MainActivity">
+
+    <!--Registration-->
+    <TextView
+        android:id="@+id/registration"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:gravity="center"
+        android:text="Registration_Form"
+        android:textSize="20dp">
+
+    </TextView>
+
+    <!--name-->
+    <EditText
+        android:id="@+id/name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/registration"
+        android:hint="Name">
+
+    </EditText>
+
+    <!--password-->
+    <EditText
+        android:id="@+id/password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/name"
+        android:hint="Password"
+        android:inputType="textPassword">
+
+    </EditText>
+
+    <!--Spinner-->
+    <TextView
+        android:id="@+id/Subject"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/password"
+        android:gravity="center"
+        android:text="Subject"
+        android:textSize="20dp">
+
+    </TextView>
+
+    <Spinner
+        android:id="@+id/spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/Subject"
+        android:entries="@array/spinner_values">
+
+    </Spinner>
+    <!--Checkbox-->
+    <LinearLayout
+        android:id="@+id/checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/spinner">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Qualification">
+
+        </TextView>
+
+        <CheckBox
+            android:id="@+id/be"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="BE" />
+
+        <CheckBox
+            android:id="@+id/me"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ME" />
+
+        <CheckBox
+            android:id="@+id/phd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="PHD" />
+    </LinearLayout>
+
+    <!--    Radio_Button-->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/checkbox"
+        android:id="@+id/radiobutton"
+        android:gravity="center">
+
+        <RadioGroup
+            android:id="@+id/gender"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Gender">
+
+            </TextView>
+
+            <RadioButton
+                android:id="@+id/Male"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Male" />
+
+            <RadioButton
+                android:id="@+id/Female"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Female" />
+
+            <RadioButton
+                android:id="@+id/Other"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Other" />
+        </RadioGroup>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/radiobutton"
+        >
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/submit"
+            android:text="Submit">
+
+        </Button>
+    </LinearLayout>
+</RelativeLayout>
+
+-----------------> Home.java
+
+package com.example.expt_04;
+
+import android.os.Bundle;
+import android.widget.TextView;
+
+import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+
+public class Home extends AppCompatActivity {
+
+
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_home);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+        TextView text1 = findViewById(R.id.text1);
+        TextView text2 = findViewById(R.id.text2);
+        TextView text3 = findViewById(R.id.text3);
+        TextView text4 = findViewById(R.id.text4);
+        TextView text5 = findViewById(R.id.text5);
+
+        Bundle extras = getIntent().getExtras();
+
+        if(extras!=null)
+        {
+            text1.setText(extras.getString("name"));
+            text2.setText(extras.getString("password"));
+            text3.setText(extras.getString("spinner"));
+            text4.setText(extras.getString("rdgrp"));
+            text5.setText(extras.getString("checked"));
+
+
+        }
+
+    }
+}
+
+-----------------> activity_home.xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Home">
+
+    <TextView
+        android:id="@+id/text1"
+        android:layout_margin="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Text"
+        android:gravity="center">
+    </TextView>
+    <TextView
+        android:id="@+id/text2"
+        android:layout_margin="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/text1"
+        android:text="Text"
+        android:gravity="center">
+    </TextView>
+    <TextView
+        android:id="@+id/text3"
+        android:layout_margin="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/text2"
+        android:text="Text"
+        android:gravity="center">
+    </TextView>
+    <TextView
+        android:id="@+id/text4"
+        android:layout_margin="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/text3"
+        android:text="Text"
+        android:gravity="center">
+    </TextView>
+    <TextView
+        android:id="@+id/text5"
+        android:layout_margin="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/text4"
+        android:text="Text"
+        android:gravity="center">
+    </TextView>
+
+</RelativeLayout>
+
+
+-----------------> values.xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="spinner_values">
+        <item>Item_01</item>
+        <item>Item_02</item>
+        <item>Item_03</item>
+        <item>Item_04</item>
+    </string-array>
+</resources>
