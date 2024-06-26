@@ -1,179 +1,91 @@
---------> activity_main.xml
+#include <stdio.h>
+#include <stdlib.h>
 
-<?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/main"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".MainActivity">
+#define SIZE 5
 
+typedef struct {
+    int items[SIZE];
+    int front;
+    int rear;
+} CircularQueue;
 
-    <GridLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:rowCount="3"
-        android:columnCount="2"
-        >
-        <androidx.cardview.widget.CardView
-            android:layout_height="150dp"
-            android:layout_width="150dp"
-            android:layout_column="0"
-            android:layout_row="0"
-            android:layout_margin="20dp"
-            >
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:orientation="vertical"
-                >
-                <ImageView
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:src="@drawable/home">
+void initQueue(CircularQueue* q) {
+    q->front = -1;
+    q->rear = -1;
+}
 
-                </ImageView>
-                <TextView
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:text="Home">
-                </TextView>
-            </LinearLayout>
-    </androidx.cardview.widget.CardView>
-        <androidx.cardview.widget.CardView
-            android:layout_height="150dp"
-            android:layout_width="150dp"
-            android:layout_column="1"
-            android:layout_row="0"
-            android:layout_margin="20dp"
-            >
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:orientation="vertical"
-                >
-                <ImageView
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:src="@drawable/wifi">
+int isFull(CircularQueue* q) {
+    if ((q->front == q->rear + 1) || (q->front == 0 && q->rear == SIZE - 1)) {
+        return 1;
+    }
+    return 0;
+}
 
-                </ImageView>
-                <TextView
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:text="wifi">
-                </TextView>
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-        <androidx.cardview.widget.CardView
-            android:layout_height="150dp"
-            android:layout_width="150dp"
-            android:layout_column="0"
-            android:layout_row="1"
-            android:layout_margin="20dp"
-            >
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:orientation="vertical"
-                >
-                <ImageView
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:src="@drawable/download">
+int isEmpty(CircularQueue* q) {
+    if (q->front == -1) return 1;
+    return 0;
+}
 
-                </ImageView>
-                <TextView
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:text="Download">
-                </TextView>
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-        <androidx.cardview.widget.CardView
-            android:layout_height="150dp"
-            android:layout_width="150dp"
-            android:layout_column="1"
-            android:layout_row="1"
-            android:layout_margin="20dp"
-            >
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:orientation="vertical"
-                >
-                <ImageView
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:src="@drawable/power_off">
+void enqueue(CircularQueue* q, int value) {
+    if (isFull(q)) {
+        printf("Queue is full\n");
+        return;
+    }
+    if (q->front == -1) q->front = 0;
+    q->rear = (q->rear + 1) % SIZE;
+    q->items[q->rear] = value;
+    printf("Inserted %d\n", value);
+}
 
-                </ImageView>
-                <TextView
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:text="Power_Off">
-                </TextView>
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-        <androidx.cardview.widget.CardView
-            android:layout_height="150dp"
-            android:layout_width="150dp"
-            android:layout_column="0"
-            android:layout_row="2"
-            android:layout_margin="20dp"
-            >
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:orientation="vertical"
-                >
-                <ImageView
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:src="@drawable/send">
+int dequeue(CircularQueue* q) {
+    int item;
+    if (isEmpty(q)) {
+        printf("Queue is empty\n");
+        return -1;
+    }
+    item = q->items[q->front];
+    if (q->front == q->rear) {
+        q->front = -1;
+        q->rear = -1;
+    } else {
+        q->front = (q->front + 1) % SIZE;
+    }
+    printf("Removed %d\n", item);
+    return item;
+}
 
-                </ImageView>
-                <TextView
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:text="Send">
-                </TextView>
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-        <androidx.cardview.widget.CardView
-            android:layout_height="150dp"
-            android:layout_width="150dp"
-            android:layout_column="1"
-            android:layout_row="2"
-            android:layout_margin="20dp"
-            >
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:orientation="vertical"
-                >
-                <ImageView
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:src="@drawable/setting">
+void display(CircularQueue* q) {
+    int i;
+    if (isEmpty(q)) {
+        printf("Queue is empty\n");
+        return;
+    }
+    printf("Front -> %d \n", q->front);
+    printf("Items -> ");
+    for (i = q->front; i != q->rear; i = (i + 1) % SIZE) {
+        printf("%d ", q->items[i]);
+    }
+    printf("%d ", q->items[i]);
+    printf("\nRear -> %d\n", q->rear);
+}
 
-                </ImageView>
-                <TextView
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:text="Setting">
-                </TextView>
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
+int main() {
+    CircularQueue q;
+    initQueue(&q);
 
-    </GridLayout>
+    enqueue(&q, 1);
+    enqueue(&q, 2);
+    enqueue(&q, 3);
+    enqueue(&q, 4);
+    enqueue(&q, 5);
 
-  </RelativeLayout>
+    display(&q);
+
+    dequeue(&q);
+    display(&q);
+
+    enqueue(&q, 6);
+    display(&q);
+
+    return 0;
+}
