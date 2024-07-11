@@ -1,84 +1,49 @@
-----------------------> MainActivity.java
+#include <stdint.h>
+#include <stdio.h>
 
-package com.example.expt_06;
+// Define the base address of NVMe controller registers (example address)
+#define NVME_REG_BASE 0x10000000
 
-import android.os.Bundle;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
+// Define offsets for doorbell registers
+#define SUBMISSION_QUEUE_DB_OFFSET 0x1000
+#define COMPLETION_QUEUE_DB_OFFSET 0x2000
 
-import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-
-public class MainActivity extends AppCompatActivity {
-
-    WebView webView;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_main);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
-
-        webView = (WebView) findViewById(R.id.webview);
-        webView.setWebViewClient(new WebViewClient());
-        webView.getSettings().setJavaScriptEnabled(true);
-        webView.loadUrl("https://www.google.com/");
-    }
+// Function to write to a memory-mapped register
+void write_mmio(uint64_t addr, uint32_t value) {
+    *((volatile uint32_t *)addr) = value;
 }
 
+// Function to read from a memory-mapped register
+uint32_t read_mmio(uint64_t addr) {
+    return *((volatile uint32_t *)addr);
+}
 
--------------------------> activity_main.xml
+// Function to notify the controller of a new command
+void notify_submission_queue(uint16_t queue_id, uint16_t new_tail) {
+    uint64_t db_addr = NVME_REG_BASE + SUBMISSION_QUEUE_DB_OFFSET + (queue_id * 8);
+    write_mmio(db_addr, new_tail);
+}
 
-<?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".MainActivity">
+// Function to notify the host of a completed command
+void notify_completion_queue(uint16_t queue_id, uint16_t new_head) {
+    uint64_t db_addr = NVME_REG_BASE + COMPLETION_QUEUE_DB_OFFSET + (queue_id * 8);
+    write_mmio(db_addr, new_head);
+}
 
-    <WebView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/webview"/>
+int main() {
+    uint16_t submission_queue_id = 1;
+    uint16_t submission_queue_tail = 5; // Example value
 
-</RelativeLayout>
+    uint16_t completion_queue_id = 1;
+    uint16_t completion_queue_head = 3; // Example value
 
----------------------------> AndroidManifest.xml
+    // Notify NVMe controller of a new command
+    notify_submission_queue(submission_queue_id, submission_queue_tail);
 
-<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
-    <uses-permission android:name="android.permission.INTERNET"/>
+    // Notify the host of a completed command
+    notify_completion_queue(completion_queue_id, completion_queue_head);
 
-    <application
-        android:allowBackup="true"
-        android:dataExtractionRules="@xml/data_extraction_rules"
-        android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
-        android:supportsRtl="true"
-        android:theme="@style/Theme.EXPT_06"
-        tools:targetApi="31">
-        <activity
-            android:name=".MainActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+    printf("Submission and completion notifications sent.\n");
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-    </application>
-
-</manifest>
+    return 0;
+}
